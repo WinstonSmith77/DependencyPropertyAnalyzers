@@ -25,53 +25,75 @@ namespace DependencyProperty.Analyzer.Test
         [TestMethod]
         public void TestMethod2()
         {
-            var test = @"
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Text;
-    using System.Threading.Tasks;
-    using System.Diagnostics;
+            var test = @"using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows;
 
-    namespace ConsoleApplication1
+
+namespace DependencyProperty.Analyzer.Test
+{
+    
+    public class Dummy : DependencyObject
     {
-        class TypeName
-        {   
+        public static readonly System.Windows.DependencyProperty IsAnyGoodProperty = System.Windows.DependencyProperty.Register(
+            ""IsAnyGood"", typeof (bool), typeof (Dummy), new PropertyMetadata(default(bool)));
+
+        public bool IsAnyGood
+        {
+            get { return (bool)GetValue(IsAnyGoodProperty); }
+            set { SetValue(IsAnyGoodProperty, value); }
         }
-    }";
+    }
+}
+
+";
             var expected = new DiagnosticResult
             {
                 Id = "DependencyPropertyAnalyzer",
-                Message = String.Format("Type name '{0}' contains lowercase letters", "TypeName"),
+                Message = $"DProp  '{"IsAnyGood"}' contains string literal.",
                 Severity = DiagnosticSeverity.Warning,
                 Locations =
                     new[] {
-                            new DiagnosticResultLocation("Test0.cs", 11, 15)
+                            new DiagnosticResultLocation("Test0.cs", 14, 86)
                         }
             };
 
             VerifyCSharpDiagnostic(test, expected);
-
-            var fixtest = @"
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Text;
-    using System.Threading.Tasks;
-    using System.Diagnostics;
-
-    namespace ConsoleApplication1
-    {
-        class TYPENAME
-        {   
-        }
-    }";
-            VerifyCSharpFix(test, fixtest);
         }
 
-        protected override CodeFixProvider GetCSharpCodeFixProvider()
+        [TestMethod]
+        public void TestMethod3()
         {
-            return new DependencyPropertyAnalyzerCodeFixProvider();
+            var test = @"using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows;
+
+
+namespace DependencyProperty.Analyzer.Test
+{
+    
+    public class Dummy : DependencyObject
+    {
+        public static readonly System.Windows.DependencyProperty IsAnyGoodProperty = System.Windows.DependencyProperty.Register(
+            nameof(IsAnyGood), typeof (bool), typeof (Dummy), new PropertyMetadata(default(bool)));
+
+        public bool IsAnyGood
+        {
+            get { return (bool)GetValue(IsAnyGoodProperty); }
+            set { SetValue(IsAnyGoodProperty, value); }
+        }
+    }
+}
+
+";
+
+            VerifyCSharpDiagnostic(test);
         }
 
         protected override DiagnosticAnalyzer GetCSharpDiagnosticAnalyzer()

@@ -33,11 +33,21 @@ namespace DependencyProperty.Analyzer
             context.RegisterSyntaxNodeAction(AnalyzeNode, SyntaxKind.SimpleMemberAccessExpression);
         }
 
+        private static bool IsLastPartOfNameSpace(string nameSpace, string name)
+        {
+            return nameSpace.Split('.').Last() == name;
+        }
+
         private void AnalyzeNode(SyntaxNodeAnalysisContext context)
         {
             var memberAccess = (MemberAccessExpressionSyntax)context.Node;
-            if (memberAccess.Expression.ToString() == "DependencyProperty" && memberAccess.Name.ToString() == "Register")
+            if (memberAccess.Name.ToString() == "Register")
             {
+
+                if (!IsLastPartOfNameSpace(memberAccess.Expression.ToString(), "DependencyProperty"))
+                {
+                    return;
+                }
                 var parent = memberAccess.Parent;
 
                 var argumentList = parent.ChildNodes().FirstOrDefault(child => child is ArgumentListSyntax);
@@ -59,7 +69,7 @@ namespace DependencyProperty.Analyzer
                     return;
                 }
 
-                var diagnostic = Diagnostic.Create(Rule, memberAccess.GetLocation(), stringLiteral.ToString());
+                var diagnostic = Diagnostic.Create(Rule, memberAccess.GetLocation(), stringLiteral.ToString().Trim('\"'));
                 context.ReportDiagnostic(diagnostic);
             }
 
