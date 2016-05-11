@@ -62,7 +62,7 @@ namespace DependencyProperty.Analyzer {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to String literal in DProp name..
+        ///   Looks up a localized string similar to String literal in DependencyProperty Name Parameter..
         /// </summary>
         internal static string AnalyzerDescription {
             get {
@@ -71,7 +71,7 @@ namespace DependencyProperty.Analyzer {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to DProp  &apos;{0}&apos; contains string literal..
+        ///   Looks up a localized string similar to DependencyProperty &apos;{0}&apos; contains string literal..
         /// </summary>
         internal static string AnalyzerMessageFormat {
             get {
@@ -80,7 +80,7 @@ namespace DependencyProperty.Analyzer {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to String literal in DProp name..
+        ///   Looks up a localized string similar to String literal in DependencyProperty Name Parameter..
         /// </summary>
         internal static string AnalyzerTitle {
             get {

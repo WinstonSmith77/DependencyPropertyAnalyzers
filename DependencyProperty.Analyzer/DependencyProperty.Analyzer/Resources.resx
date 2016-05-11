@@ -118,15 +118,15 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="AnalyzerDescription" xml:space="preserve">
-    <value>String literal in DProp name.</value>
+    <value>String literal in DependencyProperty Name Parameter.</value>
     <comment>An optional longer localizable description of the diagnostic.</comment>
   </data>
   <data name="AnalyzerMessageFormat" xml:space="preserve">
-    <value>DProp  '{0}' contains string literal.</value>
+    <value>DependencyProperty '{0}' contains string literal.</value>
     <comment>The format-able message the diagnostic displays.</comment>
   </data>
   <data name="AnalyzerTitle" xml:space="preserve">
-    <value>String literal in DProp name.</value>
+    <value>String literal in DependencyProperty Name Parameter.</value>
     <comment>The title of the diagnostic.</comment>
   </data>
 </root>

@@ -53,7 +53,7 @@ namespace DependencyProperty.Analyzer.Test
             var expected = new DiagnosticResult
             {
                 Id = "DependencyPropertyAnalyzer",
-                Message = $"DProp  '{"IsAnyGood"}' contains string literal.",
+                Message = $"DependencyProperty '{"IsAnyGood"}' contains string literal.",
                 Severity = DiagnosticSeverity.Warning,
                 Locations =
                     new[] {
