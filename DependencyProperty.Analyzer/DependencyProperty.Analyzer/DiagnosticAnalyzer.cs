@@ -22,15 +22,47 @@ namespace DependencyProperty.Analyzer
         private static readonly LocalizableString Description = new LocalizableResourceString(nameof(Resources.AnalyzerDescription), Resources.ResourceManager, typeof(Resources));
         private const string Category = "Naming";
 
-        private static DiagnosticDescriptor Rule = new DiagnosticDescriptor(DiagnosticId, Title, MessageFormat, Category, DiagnosticSeverity.Warning, isEnabledByDefault: true, description: Description);
+        private static readonly DiagnosticDescriptor Rule = new DiagnosticDescriptor(DiagnosticId, Title, MessageFormat, Category, DiagnosticSeverity.Warning, isEnabledByDefault: true, description: Description);
 
-        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get { return ImmutableArray.Create(Rule); } }
+        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(Rule);
 
         public override void Initialize(AnalysisContext context)
         {
             // TODO: Consider registering other actions that act on syntax instead of or in addition to symbols
             // See https://github.com/dotnet/roslyn/blob/master/docs/analyzers/Analyzer%20Actions%20Semantics.md for more information
-            context.RegisterSymbolAction(AnalyzeSymbol, SymbolKind.NamedType);
+            context.RegisterSyntaxNodeAction(AnalyzeNode, SyntaxKind.SimpleMemberAccessExpression);
+        }
+
+        private void AnalyzeNode(SyntaxNodeAnalysisContext context)
+        {
+            var memberAccess = (MemberAccessExpressionSyntax)context.Node;
+            if (memberAccess.Expression.ToString() == "DependencyProperty" && memberAccess.Name.ToString() == "Register")
+            {
+                var parent = memberAccess.Parent;
+
+                var argumentList = parent.ChildNodes().FirstOrDefault(child => child is ArgumentListSyntax);
+                if (argumentList == null)
+                {
+                    return;
+                }
+
+                var argument = argumentList.ChildNodes().FirstOrDefault(child => child is ArgumentSyntax);
+                if (argument == null)
+                {
+                    return;
+                }
+
+                var stringLiteral = argument.ChildNodes().FirstOrDefault(child => child is LiteralExpressionSyntax && child.Kind() == SyntaxKind.StringLiteralExpression);
+
+                if (stringLiteral == null)
+                {
+                    return;
+                }
+
+                var diagnostic = Diagnostic.Create(Rule, memberAccess.GetLocation(), stringLiteral.ToString());
+                context.ReportDiagnostic(diagnostic);
+            }
+
         }
 
         private static void AnalyzeSymbol(SymbolAnalysisContext context)
