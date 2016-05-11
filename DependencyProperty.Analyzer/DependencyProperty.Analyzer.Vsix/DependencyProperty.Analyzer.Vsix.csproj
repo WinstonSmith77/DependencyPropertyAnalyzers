@@ -13,8 +13,8 @@
     <ProjectGuid>{4172403A-9F2B-4FB2-8451-29063965276D}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>DependencyProperty.Analyzer.Vsix</RootNamespace>
-    <AssemblyName>DependencyProperty.Analyzer.Vsix</AssemblyName>
+    <RootNamespace>DependencyProperty.Analyzer</RootNamespace>
+    <AssemblyName>DependencyProperty.Analyzer</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <GeneratePkgDefFile>false</GeneratePkgDefFile>
     <IncludeAssemblyInVSIXContainer>false</IncludeAssemblyInVSIXContainer>
