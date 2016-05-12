@@ -17,12 +17,21 @@ namespace DependencyProperty.Analyzer
 
         // You can change these strings in the Resources.resx file. If you do not want your analyzer to be localize-able, you can use regular strings for Title and MessageFormat.
         // See https://github.com/dotnet/roslyn/blob/master/docs/analyzers/Localizing%20Analyzers.md for more on localization
-        private static readonly LocalizableString Title = new LocalizableResourceString(nameof(Resources.AnalyzerTitle), Resources.ResourceManager, typeof(Resources));
-        private static readonly LocalizableString MessageFormat = new LocalizableResourceString(nameof(Resources.AnalyzerMessageFormat), Resources.ResourceManager, typeof(Resources));
-        private static readonly LocalizableString Description = new LocalizableResourceString(nameof(Resources.AnalyzerDescription), Resources.ResourceManager, typeof(Resources));
+        private static readonly LocalizableString Title = new LocalizableResourceString(
+            nameof(Resources.AnalyzerTitle), Resources.ResourceManager, typeof(Resources));
+
+        private static readonly LocalizableString MessageFormat =
+            new LocalizableResourceString(nameof(Resources.AnalyzerMessageFormat), Resources.ResourceManager,
+                typeof(Resources));
+
+        private static readonly LocalizableString Description =
+            new LocalizableResourceString(nameof(Resources.AnalyzerDescription), Resources.ResourceManager,
+                typeof(Resources));
+
         private const string Category = "Naming";
 
-        private static readonly DiagnosticDescriptor Rule = new DiagnosticDescriptor(DiagnosticId, Title, MessageFormat, Category, DiagnosticSeverity.Warning, isEnabledByDefault: true, description: Description);
+        private static readonly DiagnosticDescriptor Rule = new DiagnosticDescriptor(DiagnosticId, Title, MessageFormat,
+            Category, DiagnosticSeverity.Warning, isEnabledByDefault: true, description: Description);
 
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(Rule);
 
@@ -35,7 +44,7 @@ namespace DependencyProperty.Analyzer
 
         private static bool IsLastPartOfNameSpace(string nameSpace, string name)
         {
-            return nameSpace.Split('.').Last() == name;
+            return nameSpace.EndsWith(name);
         }
 
         private void AnalyzeNode(SyntaxNodeAnalysisContext context)
@@ -43,26 +52,28 @@ namespace DependencyProperty.Analyzer
             var memberAccess = (MemberAccessExpressionSyntax)context.Node;
             if (memberAccess.Name.ToString() == "Register")
             {
-
                 if (!IsLastPartOfNameSpace(memberAccess.Expression.ToString(), "DependencyProperty"))
                 {
                     return;
                 }
                 var parent = memberAccess.Parent;
 
-                var argumentList = parent.ChildNodes().FirstOrDefault(child => child is ArgumentListSyntax);
+                var argumentList = parent.ChildNodes().OfType<ArgumentListSyntax>().FirstOrDefault();
                 if (argumentList == null)
                 {
                     return;
                 }
 
-                var argument = argumentList.ChildNodes().FirstOrDefault(child => child is ArgumentSyntax);
+                var argument = argumentList.ChildNodes().OfType<ArgumentSyntax>().FirstOrDefault();
                 if (argument == null)
                 {
                     return;
                 }
 
-                var stringLiteral = argument.ChildNodes().FirstOrDefault(child => child is LiteralExpressionSyntax && child.Kind() == SyntaxKind.StringLiteralExpression);
+                var stringLiteral =
+                    argument.ChildNodes().OfType<LiteralExpressionSyntax>()
+                        .FirstOrDefault(
+                            child => child.Kind() == SyntaxKind.StringLiteralExpression);
 
                 if (stringLiteral == null)
                 {
@@ -73,21 +84,6 @@ namespace DependencyProperty.Analyzer
                 context.ReportDiagnostic(diagnostic);
             }
 
-        }
-
-        private static void AnalyzeSymbol(SymbolAnalysisContext context)
-        {
-            // TODO: Replace the following code with your own analysis, generating Diagnostic objects for any issues you find
-            var namedTypeSymbol = (INamedTypeSymbol)context.Symbol;
-
-            // Find just those named type symbols with names containing lowercase letters.
-            if (namedTypeSymbol.Name.ToCharArray().Any(char.IsLower))
-            {
-                // For all such symbols, produce a diagnostic.
-                var diagnostic = Diagnostic.Create(Rule, namedTypeSymbol.Locations[0], namedTypeSymbol.Name);
-
-                context.ReportDiagnostic(diagnostic);
-            }
         }
     }
 }
